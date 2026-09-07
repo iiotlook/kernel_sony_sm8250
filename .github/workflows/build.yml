@@ -21,127 +21,129 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Sync upstream ArchieMeng kernel and apply custom configs
-      run: |
-        git config user.name "iiotlook"
-        git config user.email "iiotlook@outlook.com"
-        git remote add upstream https://github.com/ArchieMeng/kernel_sony_sm8250.git || true
-        git fetch upstream droidian
-        git reset --hard upstream/droidian
+      - name: Sync upstream ArchieMeng kernel and apply custom configs
+        run: |
+          git config user.name "iiotlook"
+          git config user.email "iiotlook@outlook.com"
+          git remote add upstream https://github.com/ArchieMeng/kernel_sony_sm8250.git || true
+          git fetch upstream droidian
+          git reset --hard upstream/droidian
 
-        # 1. Allow bridging wireless interfaces
-        sed -i 's/if (dev->priv_flags & IFF_DONT_BRIDGE)/if (0 \&\& dev->priv_flags \& IFF_DONT_BRIDGE)/g' net/bridge/br_if.c
+          # 1. Allow bridging wireless interfaces
+          sed -i 's/if (dev->priv_flags & IFF_DONT_BRIDGE)/if (0 \&\& dev->priv_flags \& IFF_DONT_BRIDGE)/g' net/bridge/br_if.c
 
-        # 2. Append extra configs
-        cat << 'CONF' >> droidian/extra.config
+          # 2. Append extra configs
+          cat << 'CONF' >> droidian/extra.config
 
-# Cgroup
-CONFIG_CPUSETS=y
-CONFIG_CGROUP_PIDS=y
-CONFIG_CGROUP_NET_PRIO=y
-CONFIG_CGROUP_HUGETLB=y
-CONFIG_CFS_BANDWIDTH=y
-CONFIG_BLK_DEV_THROTTLING=y
+          # Cgroup
+          CONFIG_CPUSETS=y
+          CONFIG_CGROUP_PIDS=y
+          CONFIG_CGROUP_NET_PRIO=y
+          CONFIG_CGROUP_HUGETLB=y
+          CONFIG_CFS_BANDWIDTH=y
+          CONFIG_BLK_DEV_THROTTLING=y
 
-# Iptables & Networking
-CONFIG_BRIDGE_NETFILTER=y
-CONFIG_IP6_NF_TARGET_MASQUERADE=y
-CONFIG_NETFILTER_XT_MATCH_IPVS=y
-CONFIG_IP6_NF_NAT=y
-CONFIG_IPVLAN=y
-CONFIG_MACVLAN=y
-CONFIG_DUMMY=y
+          # Iptables & Networking
+          CONFIG_BRIDGE_NETFILTER=y
+          CONFIG_IP6_NF_TARGET_MASQUERADE=y
+          CONFIG_NETFILTER_XT_MATCH_IPVS=y
+          CONFIG_IP6_NF_NAT=y
+          CONFIG_IPVLAN=y
+          CONFIG_MACVLAN=y
+          CONFIG_DUMMY=y
 
-# Android
-CONFIG_ANDROID=y
-CONFIG_ANDROID_BINDERFS=y
-CONFIG_ANDROID_BINDER_IPC=y
-CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
-CONFIG_ASHMEM=y
+          # Android
+          CONFIG_ANDROID=y
+          CONFIG_ANDROID_BINDERFS=y
+          CONFIG_ANDROID_BINDER_IPC=y
+          CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
+          CONFIG_ASHMEM=y
 
-# CD-ROM / ISO
-CONFIG_ISO9660_FS=m
-CONFIG_JOLIET=y
-CONFIG_ZISOFS=y
-CONFIG_UDF_FS=m
-CONFIG_UDF_NLS=y
+          # CD-ROM / ISO
+          CONFIG_ISO9660_FS=m
+          CONFIG_JOLIET=y
+          CONFIG_ZISOFS=y
+          CONFIG_UDF_FS=m
+          CONFIG_UDF_NLS=y
 
-# CIFS
-CONFIG_CIFS=y
-CONFIG_CIFS_ALLOW_INSECURE_LEGACY=y
-CONFIG_CIFS_XATTR=y
+          # CIFS
+          CONFIG_CIFS=y
+          CONFIG_CIFS_ALLOW_INSECURE_LEGACY=y
+          CONFIG_CIFS_XATTR=y
 
-# KVM
-CONFIG_HAVE_KVM_IRQCHIP=y
-CONFIG_HAVE_KVM_IRQFD=y
-CONFIG_HAVE_KVM_IRQ_ROUTING=y
-CONFIG_HAVE_KVM_EVENTFD=y
-CONFIG_KVM_MMIO=y
-CONFIG_HAVE_KVM_MSI=y
-CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT=y
-CONFIG_KVM_VFIO=y
-CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL=y
-CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
-CONFIG_HAVE_KVM_IRQ_BYPASS=y
-CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE=y
-CONFIG_IRQ_BYPASS_MANAGER=y
-CONFIG_VIRTUALIZATION=y
-CONFIG_KVM=y
-CONFIG_KVM_ARM_HOST=y
-CONFIG_KVM_ARM_PMU=y
-CONFIG_KVM_INDIRECT_VECTORS=y
-CONFIG_VHOST_NET=y
-CONFIG_VHOST=y
-CONF
+          # KVM
+          CONFIG_HAVE_KVM_IRQCHIP=y
+          CONFIG_HAVE_KVM_IRQFD=y
+          CONFIG_HAVE_KVM_IRQ_ROUTING=y
+          CONFIG_HAVE_KVM_EVENTFD=y
+          CONFIG_KVM_MMIO=y
+          CONFIG_HAVE_KVM_MSI=y
+          CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT=y
+          CONFIG_KVM_VFIO=y
+          CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL=y
+          CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
+          CONFIG_HAVE_KVM_IRQ_BYPASS=y
+          CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE=y
+          CONFIG_IRQ_BYPASS_MANAGER=y
+          CONFIG_VIRTUALIZATION=y
+          CONFIG_KVM=y
+          CONFIG_KVM_ARM_HOST=y
+          CONFIG_KVM_ARM_PMU=y
+          CONFIG_KVM_INDIRECT_VECTORS=y
+          CONFIG_VHOST_NET=y
+          CONFIG_VHOST=y
+          CONF
 
-        git commit -am "feat(droidian): sync ArchieMeng latest kernel and apply iiotlook configs"
+          git commit -am "feat(droidian): sync ArchieMeng latest kernel and apply iiotlook configs"
 
-    - name: Make output dir
-      run: mkdir -pv /tmp/results
+      - name: Make output dir
+        run: mkdir -pv /tmp/results
 
-    - name: Build packages in the container
-      run: |
-        docker run         -v ${{ github.workspace }}:/build/sources -v /tmp/results:/build         quay.io/droidian/build-essential:next-amd64 /bin/bash -c "cd /build/sources && RELENG_HOST_ARCH=arm64 releng-build-package"
+      - name: Build packages in the container
+        run: |
+          docker run \
+          -v ${{ github.workspace }}:/build/sources -v /tmp/results:/build \
+          quay.io/droidian/build-essential:next-amd64 /bin/bash -c "cd /build/sources && RELENG_HOST_ARCH=arm64 releng-build-package"
 
-    - uses: actions/upload-artifact@v4
-      with:
-        path: /tmp/results
+      - uses: actions/upload-artifact@v4
+        with:
+          path: /tmp/results
 
-    - name: Get version
-      run: echo "version=$(head -n1 debian/changelog | cut -d '(' -f2 | cut -d ')' -f1 | sed 's/+/-/g')" >> $GITHUB_ENV
+      - name: Get version
+        run: echo "version=$(head -n1 debian/changelog | cut -d '(' -f2 | cut -d ')' -f1 | sed 's/+/-/g')" >> $GITHUB_ENV
 
-    - name: Create latest release
-      uses: softprops/action-gh-release@v2.2.2
-      with:
-        files: /tmp/results/*
-        tag_name: ${{ env.version }}
-        draft: false
+      - name: Create latest release
+        uses: softprops/action-gh-release@v2.2.2
+        with:
+          files: /tmp/results/*
+          tag_name: ${{ env.version }}
+          draft: false
 
-    - name: Generate files for Github Page of this repo
-      run: |
-        cd /tmp/results
-        sudo chown -R $(whoami) .
-        rmdir sources
-        ls -1 > files
+      - name: Generate files for Github Page of this repo
+        run: |
+          cd /tmp/results
+          sudo chown -R $(whoami) .
+          rmdir sources
+          ls -1 > files
 
-        # Generate index.html
-        dir=$(pwd)
-        echo '<!DOCTYPE html><html><head><title>Index</title></head><body>' > index.html
-        for file in *; do
-            if [ $file != "index.html" ]; then
-                echo "<a href="$file">$file</a><br>" >> index.html
-            fi
-        done
-        echo "</body></html>" >> index.html
+          # Generate index.html
+          dir=$(pwd)
+          echo '<!DOCTYPE html><html><head><title>Index</title></head><body>' > index.html
+          for file in *; do
+              if [ "$file" != "index.html" ]; then
+                  echo "<a href=\"$file\">$file</a><br>" >> index.html
+              fi
+          done
+          echo "</body></html>" >> index.html
 
-    - name: Upload pages artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: /tmp/results
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: /tmp/results
 
   deploy:
     environment:
